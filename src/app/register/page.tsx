@@ -1,7 +1,4 @@
 "use client";
-
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -11,61 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useFetchData } from "@/hooks/postData";
-import { UserRegister } from "@/interface/register";
+import SubmitButton from "@/components/ui/submitButton";
+import { signUp } from "@/lib/auth";
+import { useActionState } from "react";
 
 export default function RegistroForm() {
-  const [nombre, setNombre] = useState("");
-  const [correo, setCorreo] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const {
-    data,
-    error: errorPost,
-    isLoading,
-    sendRequest,
-  } = useFetchData<UserRegister>();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    if (!nombre || !correo || !password || !confirmPassword) {
-      setError("Por favor, completa todos los campos.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden.");
-      return;
-    }
-    const userInfo = {
-      name: nombre,
-      email: correo,
-      password,
-    };
-    await sendRequest("/users", "POST", userInfo)
-      .then((res) => {
-        console.log(res);
-        console.log(data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    if (errorPost) {
-      setError(errorPost);
-    } else {
-      setNombre("");
-      setCorreo("");
-      setPassword("");
-      setConfirmPassword("");
-      setError("");
-    }
-
-    alert("Registro exitoso");
-  };
+  const [state, action] = useActionState(signUp, undefined);
 
   return (
     <div className="dark bg-background text-foreground min-h-screen flex items-center justify-center">
@@ -75,7 +23,7 @@ export default function RegistroForm() {
           <CardDescription>Crea una nueva cuenta</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form action={action}>
             <div className="space-y-2">
               <Label htmlFor="nombre" className="text-foreground">
                 Nombre
@@ -84,11 +32,13 @@ export default function RegistroForm() {
                 id="nombre"
                 type="text"
                 placeholder="Tu nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
+                name="name"
                 required
                 className="bg-background text-foreground border-input focus:ring-primary"
               />
+              <p className="text-sm text-red-500">
+                {state?.error?.name?.join(", ")}
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="correo" className="text-foreground">
@@ -97,12 +47,14 @@ export default function RegistroForm() {
               <Input
                 id="correo"
                 type="email"
+                name="email"
                 placeholder="tu@ejemplo.com"
-                value={correo}
-                onChange={(e) => setCorreo(e.target.value)}
                 required
                 className="bg-background text-foreground border-input focus:ring-primary"
               />
+              <p className="text-sm text-red-500">
+                {state?.error?.email?.join(", ")}
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password" className="text-foreground">
@@ -111,12 +63,12 @@ export default function RegistroForm() {
               <Input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
                 required
                 className="bg-background text-foreground border-input focus:ring-primary"
               />
             </div>
+            <p className="text-sm text-red-500">{state?.message}</p>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword" className="text-foreground">
                 Confirmar contraseña
@@ -124,27 +76,11 @@ export default function RegistroForm() {
               <Input
                 id="confirmPassword"
                 type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 className="bg-background text-foreground border-input focus:ring-primary"
               />
             </div>
-            {error && (
-              <Alert
-                variant="destructive"
-                className="bg-destructive/15 text-destructive"
-              >
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <Button
-              type="submit"
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-              disabled={isLoading}
-            >
-              Registrarse
-            </Button>
+            <SubmitButton>Registrar</SubmitButton>
           </form>
         </CardContent>
       </Card>
