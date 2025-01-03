@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import SubmitButton from "@/components/ui/submitButton";
+import SubmitButton from "@/components/submitButton";
 import { signUp } from "@/lib/auth";
 import { useActionState } from "react";
 

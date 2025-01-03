@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Icons } from "@/components/ui/icons";
-import SubmitButton from "@/components/ui/submitButton";
+import SubmitButton from "@/components/submitButton";
 import Link from "next/link";
 import { useActionState } from "react";
 import { signIn } from "@/lib/auth";
